@@ -1,0 +1,27 @@
+# Laboratorio N°1 — Semana 2 — Sistemas Distribuidos (FDICI25 / INFO35)
+# Dos nodos (contenedores) en la red sd_net. NET_ADMIN permite usar `tc`.
+services:
+  servidor:
+    build: .
+    container_name: servidor
+    command: python servidor.py
+    environment:
+      PUERTO: "5000"
+      SIMULAR_LATENCIA_MS: "0"   # Plan B si tc no funciona
+    cap_add: [NET_ADMIN]
+    networks: [sd_net]
+
+  cliente:
+    build: .
+    container_name: cliente
+    command: sleep infinity      # el cliente se ejecuta a mano con docker compose exec
+    depends_on: [servidor]
+    environment:
+      SERVIDOR_HOST: servidor
+      PUERTO: "5000"
+    cap_add: [NET_ADMIN]
+    networks: [sd_net]
+
+networks:
+  sd_net:
+    name: sd_net
