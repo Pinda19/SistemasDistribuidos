@@ -1,0 +1,47 @@
+# Demo CAP — Semana 3, Sistemas Distribuidos (FDICI25)
+# Dos réplicas de un almacén clave-valor y un cliente.
+#   sd_net  : red por la que el cliente habla con ambas réplicas.
+#   sd_repl : red por la que las réplicas se sincronizan entre sí.
+# La "partición" se provoca desconectando replica_b SOLO de sd_repl:
+# el cliente sigue alcanzando a las dos, pero ellas dejan de verse.
+#
+#   MODO=AP docker compose up -d --build     (por defecto)
+#   MODO=CP docker compose up -d --build
+
+services:
+  replica_a:
+    build: .
+    container_name: replica_a
+    environment:
+      NOMBRE: replica_a
+      PEER: http://peer_b:8000
+      MODO: ${MODO:-AP}
+    networks:
+      sd_net:
+      sd_repl:
+        aliases: [peer_a]
+
+  replica_b:
+    build: .
+    container_name: replica_b
+    environment:
+      NOMBRE: replica_b
+      PEER: http://peer_a:8000
+      MODO: ${MODO:-AP}
+    networks:
+      sd_net:
+      sd_repl:
+        aliases: [peer_b]
+
+  cliente:
+    build: .
+    container_name: cliente
+    command: ["sleep", "infinity"]
+    networks:
+      - sd_net
+
+networks:
+  sd_net:
+    name: sd_net
+  sd_repl:
+    name: sd_repl
