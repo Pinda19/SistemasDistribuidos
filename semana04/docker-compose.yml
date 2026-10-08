@@ -1,0 +1,29 @@
+# Semana 4 — primer socket TCP entre dos nodos.
+# Dos contenedores en la red sd_net. El código se monta como volumen: editar y volver a ejecutar, sin rebuild.
+services:
+  servidor:
+    build: .
+    container_name: servidor
+    hostname: servidor
+    volumes:
+      - ./servidor:/app
+    command: ["python", "-u", "servidor.py", "5000"]
+    networks:
+      - sd_net
+
+  cliente:
+    build: .
+    container_name: cliente
+    hostname: cliente
+    volumes:
+      - ./cliente:/app
+    stdin_open: true
+    tty: true
+    cap_add:
+      - NET_ADMIN
+    networks:
+      - sd_net
+
+networks:
+  sd_net:
+    name: sd_net
