@@ -1,0 +1,46 @@
+# Demo de modelos de concurrencia — Semana 6
+# Elegir el modelo con la variable MODELO: secuencial | hilos | procesos | asyncio
+#   bash/zsh:    MODELO=hilos docker compose up -d --force-recreate servidor
+#   PowerShell:  $env:MODELO="hilos"; docker compose up -d --force-recreate servidor
+services:
+  servidor:
+    build: .
+    container_name: sd_servidor
+    command: python servidor_${MODELO:-secuencial}.py
+    environment:
+      - PUERTO=5000
+      - SIN_LOCK=${SIN_LOCK:-0}
+    ports:
+      - "${PUERTO_HOST:-5000}:5000"
+    networks:
+      - sd_net
+
+  cliente:
+    build: .
+    container_name: sd_cliente
+    command: sleep infinity
+    stdin_open: true
+    tty: true
+    environment:
+      - SERVIDOR_HOST=servidor
+      - SERVIDOR_PUERTO=5000
+    networks:
+      - sd_net
+    depends_on:
+      - servidor
+
+  carga:
+    build: .
+    container_name: sd_carga
+    command: sleep infinity
+    environment:
+      - SERVIDOR_HOST=servidor
+      - SERVIDOR_PUERTO=5000
+    networks:
+      - sd_net
+    depends_on:
+      - servidor
+
+networks:
+  sd_net:
+    name: sd_net

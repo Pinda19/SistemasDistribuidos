@@ -1,0 +1,50 @@
+# Semana 6 — servicio propio concurrente. Tres contenedores en la red sd_net.
+# El servidor publica su puerto al host para la prueba cruzada con otro equipo.
+#   Levantar:            docker compose up -d --build
+#   Cliente interactivo: docker compose exec cliente python cliente.py
+#   Carga:               docker compose exec carga python cliente_carga.py --clientes 5 --comando "ESPERA 2"
+#   Prueba cruzada:      docker compose exec -e SERVIDOR_HOST=<IP_OTRO_EQUIPO> cliente python cliente.py
+#   Carrera:             SIN_LOCK=1 docker compose up -d --force-recreate servidor
+services:
+  servidor:
+    build: .
+    container_name: sd_servidor
+    command: python servidor.py
+    environment:
+      - PUERTO=5000
+      - SIN_LOCK=${SIN_LOCK:-0}
+      - TIMEOUT_CLIENTE=60
+    ports:
+      - "5000:5000"
+    networks:
+      - sd_net
+
+  cliente:
+    build: .
+    container_name: sd_cliente
+    command: sleep infinity
+    stdin_open: true
+    tty: true
+    environment:
+      - SERVIDOR_HOST=servidor
+      - SERVIDOR_PUERTO=5000
+    networks:
+      - sd_net
+    depends_on:
+      - servidor
+
+  carga:
+    build: .
+    container_name: sd_carga
+    command: sleep infinity
+    environment:
+      - SERVIDOR_HOST=servidor
+      - SERVIDOR_PUERTO=5000
+    networks:
+      - sd_net
+    depends_on:
+      - servidor
+
+networks:
+  sd_net:
+    name: sd_net
