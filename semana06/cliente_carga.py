@@ -66,6 +66,9 @@ def main():
         dur, en_fila, operacion, ultima = resultados[i]
         print(f"  {i:7d}  {en_fila:6.2f} s  {operacion:6.2f} s  {dur:6.2f} s   {ultima}")
     print(f"TOTAL: {total:.2f} s")
+    n_ok = sum(1 for *_, ult in resultados.values() if ult.startswith("OK "))
+    n_err = sum(1 for *_, ult in resultados.values() if ult.startswith("ERROR"))
+    print(f"RESUMEN: OK={n_ok} ERROR={n_err} (ultima respuesta por cliente)")
     if args.comando.upper() == "CONTAR":
         esperado = args.clientes * args.repeticiones
         print(f"valor esperado del contador si no hubo carrera: {esperado} (suma acumulada desde el inicio del servidor)")

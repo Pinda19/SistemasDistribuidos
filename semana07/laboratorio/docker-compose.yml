@@ -1,0 +1,70 @@
+# Semana 7  servicio propio en tres niveles, red sd_net.
+#
+#   cliente / navegador  ->  nginx (80)  ->  api1 [, api2] (8000)  ->  servidor (5000)
+#        HTTP                    HTTP                 TCP, protocolo de texto del equipo
+#
+#   Levantar             docker compose up -d --build
+#   Probar la API sola   docker compose exec -e API_URL=http://api1:8000 cliente python cliente_http.py GET /items
+#   Probar por Nginx     docker compose exec cliente python cliente_http.py --repetir 4 GET /items
+#   Desde el navegador   http://localhost:8080/docs
+#   Cliente de texto     docker compose exec cliente python cliente.py
+#
+# El puerto 5000 del servidor YA NO se publica al host. La unica entrada es Nginx.
+services:
+  servidor:
+    build: .
+    container_name: sd_servidor
+    command: python servidor.py
+    environment:
+      - PUERTO=5000
+      - TIMEOUT_CLIENTE=60
+    networks:
+      - sd_net
+
+  api1:
+    build: .
+    container_name: sd_api1
+    command: uvicorn api:app --host 0.0.0.0 --port 8000
+    environment:
+      - REPLICA=api1
+      - SERVIDOR_HOST=servidor
+      - SERVIDOR_PUERTO=5000
+    networks:
+      - sd_net
+    depends_on:
+      - servidor
+
+  # Paso 4  copiar el bloque api1 completo aqui abajo y cambiar
+  #         api1 -> api2,  sd_api1 -> sd_api2,  REPLICA=api1 -> REPLICA=api2
+  #         y agregar "- api2" en el depends_on de nginx
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: sd_nginx
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - "8080:80"
+    networks:
+      - sd_net
+    depends_on:
+      - api1
+
+  cliente:
+    build: .
+    container_name: sd_cliente
+    command: sleep infinity
+    stdin_open: true
+    tty: true
+    environment:
+      - API_URL=http://nginx
+      - SERVIDOR_HOST=servidor
+      - SERVIDOR_PUERTO=5000
+    networks:
+      - sd_net
+    depends_on:
+      - nginx
+
+networks:
+  sd_net:
+    name: sd_net

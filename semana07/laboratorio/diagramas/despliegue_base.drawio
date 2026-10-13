@@ -1,0 +1,40 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Despliegue v1" id="sd-semana07-v1">
+    <mxGraphModel dx="1000" dy="600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="700" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="host" value="Computador del equipo (anfitrion)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F4F4F4;strokeColor=#595959;verticalAlign=top;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="760" height="420" as="geometry"/>
+        </mxCell>
+        <mxCell id="net" value="Red Docker sd_net" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FBE9EA;strokeColor=#C1272D;dashed=1;verticalAlign=top;fontStyle=1;fontSize=12;arcSize=4;" vertex="1" parent="1">
+          <mxGeometry x="80" y="100" width="680" height="320" as="geometry"/>
+        </mxCell>
+        <mxCell id="cli" value="&lt;b&gt;cliente&lt;/b&gt;&lt;br&gt;sd_cliente&lt;br&gt;cliente.py" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#C1272D;strokeWidth=2;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="120" y="180" width="160" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="car" value="&lt;b&gt;carga&lt;/b&gt;&lt;br&gt;sd_carga&lt;br&gt;cliente_carga.py" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#C1272D;strokeWidth=2;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="120" y="300" width="160" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="srv" value="&lt;b&gt;servidor&lt;/b&gt;&lt;br&gt;sd_servidor&lt;br&gt;servidor.py, hilo por cliente" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#C1272D;strokeWidth=2;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="520" y="230" width="200" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="nota" value="Estado compartido&lt;br&gt;inventario en memoria, protegido por Lock" style="shape=note;whiteSpace=wrap;html=1;size=12;fillColor=#FFF4E0;strokeColor=#B26A00;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="520" y="340" width="200" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="e1" value="TCP 5000" style="endArrow=block;html=1;strokeColor=#595959;strokeWidth=2;fontSize=11;fontStyle=1;" edge="1" parent="1" source="cli" target="srv">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e2" value="TCP 5000" style="endArrow=block;html=1;strokeColor=#595959;strokeWidth=2;fontSize=11;fontStyle=1;" edge="1" parent="1" source="car" target="srv">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="otro" value="&lt;b&gt;Otro equipo&lt;/b&gt;&lt;br&gt;su cliente, por la red del laboratorio" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F0F8;strokeColor=#1F4E79;strokeWidth=2;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="860" y="235" width="200" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="e3" value="TCP 5000 publicado (5000 -&amp;gt; 5000)" style="endArrow=block;html=1;strokeColor=#1F4E79;strokeWidth=2;fontSize=11;fontStyle=1;" edge="1" parent="1" source="otro" target="srv">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

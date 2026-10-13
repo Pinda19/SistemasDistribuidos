@@ -1,161 +1,148 @@
-# Observaciones — Semana 6 - Laboratorio N.º 2
+# Semana 6 — Observaciones del laboratorio RepoSync
 
+**Tema:** 04. Control de versiones distribuido (simulación RepoSync).  
+**Equipo:** Thomas Pinda
+**Entorno:** Windows 10, PowerShell y Docker (contenedores Linux).  
+**Origen de la evidencia:** salidas de consola aportadas durante las pruebas del estudiante; cuando se mencionan mediciones de la demo del profesor se indican por separado. No se presentan ejemplos esperados como mediciones.
 
-**Integrantes:** Thomas Pinda
-**Dominio del servicio:** Inventario (dominio de referencia utilizado mientras se confirma la asignación)
-**Entorno:** Fedora Linux, Docker Engine y Docker Compose, contenedores Python 3.12-slim
+## Definición del servicio
 
-## Paso 1 — Servidor secuencial bajo carga
+- Repositorio inicial: `proyecto`, rama `main`, revisión inicial `HEAD=0`.
+- Estado compartido: mapa de ramas y commits en RAM, contador de revisión y contador de operaciones.
+- Comandos propios: `REPOS`, `CLONAR`, `HISTORIAL`, `RAMA`, `PUSH`; también `HOLA`, `SALIR`, `ESPERA`.
+- Operación crítica: `PUSH proyecto main 0 cambio`, que debe validar base=HEAD y actualizar historial/referencia de manera atómica.
+- Predicción: al lanzar 20 clientes simultáneos con la misma base `0`, **solo uno** puede publicar; 19 deben recibir `ERROR CONFLICTO HEAD=1` cuando el Lock está habilitado.
 
-**Comandos ejecutados (directorio `semana06/demo/`):**
+## Paso 1 — Evidencia del problema secuencial
+
+En la **demo original de Semana 6**, se ejecutó:
 
 ```bash
-docker compose up -d --build
 docker compose exec carga python cliente_carga.py --clientes 5 --comando "ESPERA 2"
 ```
 
-**Tiempo de operación por cliente:** 2.00 s aproximadamente. El tiempo total de respuesta de cada uno fue aumentando porque debía esperar su turno:
+**Resultado medido: `TOTAL: 10.01 s`.** Los cinco clientes fueron atendidos sucesivamente; la última petición terminó a los 10.01 s. Los clientes restantes esperaron en la cola de conexiones pendientes del sistema operativo mientras el proceso estaba ocupado con un cliente.
 
-| Cliente | Espera en fila | Operación | Total individual |
-|---|---:|---:|---:|
-| 4 | 0.01 s | 2.00 s | 2.01 s |
-| 1 | 2.01 s | 2.00 s | 4.01 s |
-| 0 | 4.01 s | 2.00 s | 6.01 s |
-| 2 | 6.01 s | 2.00 s | 8.01 s |
-| 3 | 8.01 s | 2.00 s | 10.01 s |
+**Importante:** esta medición corresponde a la demo de Semana 6, no todavía al `servidor_secuencial.py` específico de RepoSync. La comparación con el mismo dominio sigue pendiente si el docente la exige.
 
-**TOTAL real:** **10.01 s**.
+## Paso 2 — Servidor concurrente con hilos, errores y timeout
 
-**¿Qué esperábamos? ¿Qué observamos?** Se esperaba alrededor de `5 × 2 = 10 s`, ya que el servidor secuencial atiende una conexión a la vez. El resultado fue **10.01 s**, prácticamente igual al cálculo. Mientras el servidor atendía a uno, los demás clientes esperaban en la cola de conexiones pendientes del sistema operativo; que `connect()` termine no implica que el servidor ya esté ejecutando el comando.
+En la **misma demo original**, tras cambiar a `MODELO=hilos`, se repitió la carga `5 × ESPERA 2`.
 
-## Paso 2 — Hilo por cliente bajo carga
+**Resultado medido: `TOTAL: 2.00 s`.** La diferencia respecto al secuencial fue **8.01 s menos**, aproximadamente **5 veces más rápido** para este tipo de operación bloqueante. La concurrencia permite atender varios clientes a la vez sin que una espera en una conexión bloquee el `accept()` de las demás.
 
-**Comandos ejecutados (directorio `semana06/demo/`):**
+En **RepoSync**, el servidor cuenta con `threading.Thread`, `conn.settimeout(60)`, `try/except`, `finally` y logs por cliente. La prueba interactiva de Windows 10 verificó:
 
-```bash
-MODELO=hilos docker compose up -d --force-recreate servidor
-docker compose exec carga python cliente_carga.py --clientes 5 --comando "ESPERA 2"
+```text
+HOLA equipo                   -> OK HOLA equipo
+REPOS                         -> OK proyecto
+CLONAR proyecto main          -> OK proyecto main HEAD=0
+PUSH proyecto main 0 primer_cambio -> OK PUSH main HEAD=1
+PUSH proyecto main 0 segundo_cambio -> ERROR CONFLICTO HEAD=1
+HISTORIAL proyecto main       -> OK 1:primer_cambio | 0:inicio
+SALIR                         -> OK CHAO
 ```
 
-**TOTAL real:** **2.00 s**. Los cinco clientes reportaron aproximadamente **2.00 s** cada uno, con **0.00 s** de espera en fila (según el redondeo de la herramienta). Todos devolvieron `OK ESPERA 2`.
+**Pendiente:** medir `5 × ESPERA 2` en el RepoSync ya adaptado y registrar, si corresponde, evidencia directa del timeout de inactividad.
 
-**Diferencia respecto al Paso 1 y explicación:**
+## Paso 3 — Estado compartido y Lock
 
-| Modelo | Clientes | Comando | Tiempo total |
-|---|---:|---|---:|
-| Secuencial | 5 | `ESPERA 2` | **10.01 s** |
-| Hilo por cliente | 5 | `ESPERA 2` | **2.00 s** |
+Comando de carga (20 clientes, 1 operación cada uno):
 
-La ejecución concurrente tardó **8.01 s menos** (aproximadamente **80 % menos tiempo**, o unas **5 veces más rápida** para esta carga de espera). Cada cliente fue atendido por un hilo independiente. Como `ESPERA` no requiere mantener un Lock, los cinco hilos pudieron esperar simultáneamente sin bloquearse unos a otros.
-
-**Observación sobre el alcance:** esta comparación corresponde a la carpeta `demo`, tal como se ve en las rutas de terminal. No se adjuntó una medición separada del servidor secuencial adaptado al dominio propio dentro de `semana06/`.
-
-**Limpieza de la demostración:** se ejecutó `docker compose down -v`; la salida confirmó la eliminación de los tres contenedores y de `sd_net` correspondientes a la demo.
-
-## Paso 3 — Condición de carrera
-
-**Operación utilizada:** `QUITAR manzana 1`, ejecutada cuatro veces por cada uno de 20 clientes (`20 × 4 = 80` retiros), sobre un inventario inicial de **100 manzanas** y **100 peras**.
-
-**Valor esperado de manzanas:** `100 - 80 = 20`.
-
-### Experimento A: SIN Lock
-
-```bash
-SIN_LOCK=1 docker compose up -d --force-recreate servidor
-docker compose exec carga python cliente_carga.py --clientes 20 --comando "QUITAR manzana 1" --repeticiones 4
-docker compose exec cliente python cliente.py
-# Dentro del cliente: LISTAR
+```powershell
+docker compose exec carga python cliente_carga.py --clientes 20 --comando "PUSH proyecto main 0 cambio"
 ```
 
-- **TOTAL de la carga:** **0.03 s**.
-- **Respuesta real a `LISTAR`:** `OK manzana:91 pera:100`.
-- **Valor observado sin Lock:** **91** manzanas, en lugar de 20.
-- **Interpretación:** el inventario sólo reflejó 9 retiros netos, aunque la prueba realizó 80 operaciones de retiro. Se perdió el efecto de **71 actualizaciones** por condiciones de carrera: varios hilos leyeron un valor anterior y sobrescribieron resultados de otros hilos.
+El servidor se recreó entre ejecuciones para partir en `HEAD=0`, primero con `$env:SIN_LOCK="1"` y luego con `$env:SIN_LOCK="0"`.
 
-### Experimento B: CON Lock
+| Ejecución | Lock | `OK` recibidos | `ERROR` recibidos | `TOTAL` |
+|---|---|---:|---:|---:|
+| Prueba sin Lock | No | **11** | **9** | **0,05 s** |
+| Prueba con Lock 1 | Sí | **1** | **19** | **0,03 s** |
+| Prueba con Lock 2 | Sí | **1** | **19** | **0,03 s** |
+| Prueba con Lock 3 | Sí | **1** | **19** | No informado (solo se compartió `RESUMEN`) |
 
-```bash
-SIN_LOCK=0 docker compose up -d --force-recreate servidor
-docker compose exec carga python cliente_carga.py --clientes 20 --comando "QUITAR manzana 1" --repeticiones 4
-docker compose exec cliente python cliente.py
-# Dentro del cliente: LISTAR
+**Conclusión:** sin Lock se aceptaron 11 publicaciones utilizando la misma base obsoleta, aunque solo una debió aceptarse. La salida mostró revisiones publicadas hasta `HEAD=11`; no se hizo una consulta independiente del HEAD final. Con Lock, las tres ejecuciones generaron exactamente un `PUSH` correcto y 19 conflictos. La condición de carrera fue provocada y corregida experimentalmente.
+
+**Sección crítica en `servidor.py` (`op_push`):**
+
+1. Consultar la referencia HEAD de la rama.
+2. Compararla con `base` proporcionada por el cliente.
+3. Obtener y avanzar el ID de revisión siguiente.
+4. Insertar el nuevo commit y actualizar HEAD.
+
+Estos pasos están dentro de `with seccion_critica()` y usan `threading.Lock` cuando `SIN_LOCK=0`. `ESPERA` realiza `time.sleep()` fuera del Lock. `PAUSA_CARRERA` está configurada inicialmente a 0.005 s para hacer visible el error; debe establecerse a 0 al terminar las demostraciones.
+
+## Paso 4 — Docker Compose, red y puerto
+
+La salida de `docker compose ps` en Windows 10 confirmó:
+
+```text
+sd_servidor   semana06-servidor   Up    0.0.0.0:5000->5000/tcp, [::]:5000->5000/tcp
+sd_cliente    semana06-cliente    Up
+sd_carga      semana06-carga      Up
 ```
 
-- **TOTAL de la carga:** **0.09 s**.
-- **Respuesta real a `LISTAR`:** `OK manzana:20 pera:100`.
-- **Valor observado con Lock:** **20** manzanas, exactamente el valor esperado.
-- **Interpretación:** el Lock protegió las actualizaciones compartidas. Aunque esta ejecución tardó 0.06 s más que la versión incorrecta, evitó la pérdida de actualizaciones.
+Se verificó que el cliente pudo conectar a `servidor:5000` dentro de Compose. El archivo `docker-compose.yml` define tres servicios en la red `sd_net` y publica el puerto `5000/tcp` del servidor al equipo anfitrión.
 
-**¿Dónde exactamente está la sección crítica?** En la plantilla del servidor, `op_quitar()` utiliza `with seccion_critica():` alrededor de la lectura de `estado["inventario"]`, las validaciones de ítem existente y stock suficiente, la pausa artificial de 0.001 s y la actualización de la cantidad. `op_agregar()` también protege la lectura y escritura del inventario; `op_listar()` protege la lectura consistente del inventario; el incremento de `estado["operaciones"]` se protege por separado. `seccion_critica()` devuelve un `threading.Lock` cuando `SIN_LOCK=0`, o un contexto sin protección cuando `SIN_LOCK=1`.
-
-**Nota:** la pauta solicita verificar el resultado con Lock en **tres corridas independientes**. En las evidencias recibidas se documenta **una** corrida con Lock y **una** sin Lock. Las dos corridas adicionales siguen pendientes. Para cada una debe reiniciarse el servidor para restablecer el inventario inicial.
-
-## Paso 4 — Despliegue con Docker Compose
-
-**Comprobación:** `docker compose config` mostró una configuración válida con tres servicios: `servidor`, `cliente` y `carga`.
-
-**Salida resumida de `docker compose ps`:**
-
-| Contenedor | Servicio | Estado observado | Puerto publicado |
-|---|---|---|---|
-| `sd_servidor` | servidor | Up | `0.0.0.0:5000->5000/tcp` y `[::]:5000->5000/tcp` |
-| `sd_cliente` | cliente | Up | — |
-| `sd_carga` | carga | Up | — |
-
-**Red Docker:** `sd_net`, driver `bridge` (confirmada por `docker network ls`).
-
-**IP del equipo anfitrión durante la prueba:** **`192.168.1.92`**, interfaz `enp4s0` (`192.168.1.92/24`). Esta dirección fue asignada dinámicamente y puede cambiar. La dirección interna de Docker `172.18.0.1` no es la IP del host que otro equipo debe utilizar.
-
-**Variables verificadas en `docker compose config`:** `PUERTO=5000`, `SIN_LOCK=0`, `TIMEOUT_CLIENTE=60` para el servidor; `SERVIDOR_HOST=servidor`, `SERVIDOR_PUERTO=5000` para cliente y carga.
-
-**Topología:** los tres servicios comparten `sd_net`; el cliente interno se conecta por nombre DNS `servidor:5000`. El puerto 5000 está publicado en el anfitrión para permitir pruebas externas, siempre que la conectividad y el firewall lo permitan.
+**Pendiente:** adjuntar salida de `docker compose config` del RepoSync en Windows y anotar la IP LAN del equipo si se realizará la prueba cruzada. La dirección `192.168.1.92` usada anteriormente pertenece al PC con Fedora y no identifica necesariamente al equipo Windows actual.
 
 ## Paso 5 — Prueba cruzada
 
-**Equipo cuyo servidor probamos:** Pendiente.  
-**¿Su `protocolo.md` alcanzó para conectarse sin preguntar?:** No evaluado; no se proporcionó repositorio ni servidor de otro equipo.  
-**Mensajes enviados y respuestas del servidor ajeno:** No evaluados.  
-**Qué falló y por qué:** No hay resultados de una prueba cruzada real que permitan atribuir fallas.  
-**Equipo que probó nuestro servidor:** Pendiente.  
-**Qué reportaron:** Pendiente.
+- **Prueba con otro equipo del curso:** todavía no se ha realizado/documentado.
+- **Checklist ajeno:** pendiente de respuesta real, no simulado.
+- **Pruebas locales verificadas:** protocolo básico, `PUSH` obsoleto, `HISTORIAL`, ejecución concurrente con y sin Lock.
 
-**Verificación local disponible (no equivale a prueba cruzada):** el cliente de la plantilla se conectó a `servidor:5000` y obtuvo respuestas a `HOLA equipo`, `LISTAR`, un comando desconocido (`salid`) y `salir`:
+Se requiere coordinación con otro equipo o una alternativa aprobada por el profesor para cerrar este requisito.
+
+## Falla provocada — caída abrupta del contenedor de carga
+
+### Intento 1: tres clientes `ESPERA 5`
+
+Se inició carga con tres clientes y se ejecutó `docker compose kill carga`. Los logs indicaron tres conexiones a las **18:27:14** desde `172.18.0.4`, puertos `41208`, `41206`, `41218`, y sus cierres alrededor de **18:27:19**. No se observó excepción explícita de desconexión.
+
+**Prueba posterior de disponibilidad, efectivamente realizada:** otro cliente se conectó y recibió:
 
 ```text
-HOLA equipo  -> OK HOLA equipo
-LISTAR       -> OK manzana:100 pera:100
-salid        -> ERROR COMANDO_DESCONOCIDO
-salir        -> OK CHAO
+HOLA prueba_recuperacion -> OK HOLA prueba_recuperacion
+REPOS                    -> OK proyecto
+CLONAR proyecto main     -> OK proyecto main HEAD=1
+SALIR                    -> OK CHAO
 ```
 
-La ejecución con `listar` en minúsculas también respondió correctamente, lo que confirma que el servidor reconoce comandos sin distinguir mayúsculas.
+Esto comprueba que el servidor siguió atendiendo nuevas solicitudes y preservó su estado en memoria después del primer intento.
 
-**Pendiente académico:** coordinar la prueba cruzada con otro equipo o consultar al profesor si admite reemplazarla por una prueba desde otra máquina o contenedor independiente y registrar esa alternativa sin presentarla como una evaluación de pares.
+### Intento 2: tres clientes `ESPERA 10`
 
-## Falla provocada — Desconexión abrupta
+Se ejecutó en PowerShell:
 
-**Comandos ejecutados:**
-
-```bash
-docker compose exec -d carga python cliente_carga.py --clientes 3 --comando "ESPERA 5"
-docker compose kill carga
-docker compose logs --tail 20 servidor
+```powershell
 docker compose up -d carga
-docker compose exec cliente python cliente.py
-# Dentro del cliente: LISTAR, SALIR
+docker compose exec -d carga python cliente_carga.py --clientes 3 --comando "ESPERA 10"
+Start-Sleep -Seconds 1
+docker compose kill carga
+Start-Sleep -Seconds 11
+docker compose logs --since 1m servidor
 ```
 
-**Qué registró el servidor:** tres conexiones desde `172.18.0.3`, con puertos **44392**, **44398** y **44406**, fueron registradas a las `01:53:25,543`. Sus cierres aparecieron a las `01:53:30,544`, con `operaciones=84` en las tres líneas. Las últimas 20 líneas facilitadas **no muestran una advertencia explícita** de `ConnectionResetError` o `BrokenPipeError`.
-
-**¿El servidor siguió atendiendo a los demás?** **Sí.** Después de finalizar esa prueba y reiniciar `sd_carga`, se ejecutó un cliente nuevo y respondió:
+**Evidencia exacta de los logs del servidor (9 de octubre de 2026):**
 
 ```text
-listar -> OK manzana:20 pera:100
-salir  -> OK CHAO
+18:31:41,645 cli-36486 conexion de ('172.18.0.4', 36486)
+18:31:41,645 cli-36498 conexion de ('172.18.0.4', 36498)
+18:31:41,646 cli-36502 conexion de ('172.18.0.4', 36502)
+18:31:51,646 cli-36486 cierre de ('172.18.0.4', 36486) | operaciones=28
+18:31:51,647 cli-36498 cierre de ('172.18.0.4', 36498) | operaciones=28
+18:31:51,648 cli-36502 cierre de ('172.18.0.4', 36502) | operaciones=28
 ```
 
-La salida de `docker compose up -d carga` informó `sd_servidor Running`. Esto demuestra que el servidor continuó operativo después de la prueba. **No demuestra por sí solo que se detectara una excepción de desconexión abrupta**, pues los tres cierres quedaron registrados aproximadamente cinco segundos después de iniciar la operación. Esa diferencia debe conservarse en las observaciones, en lugar de afirmar un error que no aparece en el log adjunto.
+**Interpretación:** la caída del contenedor fue provocada aproximadamente un segundo después de iniciar la operación. Las conexiones terminaron cerrándose **~10 s después de ser abiertas**, lo que indica que el servidor concluyó la espera bloqueante antes de registrar el cierre. No apareció `ConnectionResetError` ni `BrokenPipeError`; el cierre también puede deberse a EOF. No se afirma detección inmediata de la falla.
+
+**Pendiente:** comprobar con una nueva solicitud `REPOS`/`CLONAR` que el servidor continúa accesible **después del segundo intento**. La comprobación anterior fue posterior al primer intento.
 
 ## Conclusión
 
-La demostración confirmó que el servidor secuencial acumula tiempos de espera (10.01 s para cinco clientes con `ESPERA 2`), mientras que el modelo de hilos atiende las operaciones de espera simultáneamente (2.00 s). Sin embargo, atender varios clientes al mismo tiempo introduce condiciones de carrera si comparten un recurso: con el Lock desactivado, 80 retiros dejaron 91 manzanas en vez de 20; con el Lock activo, el inventario quedó en el valor correcto. El despliegue con Docker Compose funcionó con tres servicios en `sd_net`, y el servidor continuó operativo después de finalizar el contenedor de carga. La prueba cruzada entre equipos y dos repeticiones adicionales del caso con Lock quedan pendientes.
+RepoSync reproduce un problema de coordinación de revisiones propio del control de versiones distribuido: clientes que publican sobre una referencia ya obsoleta. El ensayo con 20 clientes mostró 11 aceptaciones incorrectas sin Lock, frente a 1 aceptación y 19 conflictos en tres ejecuciones con Lock. La concurrencia mediante hilos mejora la capacidad de atender operaciones lentas, como demuestra la comparación del laboratorio de referencia (10,01 s frente a 2,00 s). En la prueba de caída del contenedor de carga, el servidor registró el cierre de las conexiones luego de completar la espera, sin excepción específica visible; tras el primer intento pudo atender nuevos clientes.
+
+**Trabajo pendiente para el cierre definitivo:** confirmar disponibilidad tras el segundo intento, medir `ESPERA 2` en RepoSync (y opcionalmente su variante secuencial), ejecutar o coordinar la prueba cruzada, registrar comprobación de Compose en Windows, y retirar la pausa artificial una vez documentada la carrera.
+
