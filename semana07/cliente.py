@@ -1,4 +1,4 @@
-"""Cliente interactivo por lineas del protocolo de texto (el mismo de la Semana 6)."""
+"""Cliente interactivo por líneas (mismo estilo que semana04, timeout 5 s por respuesta)."""
 import os
 import socket
 import sys
