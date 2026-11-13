@@ -1,0 +1,13 @@
+services:
+  rpc:
+    build: .
+    container_name: sd10_rpc
+    ports:
+      - "8010:8000"
+    networks:
+      - sd10_net
+    restart: unless-stopped
+
+networks:
+  sd10_net:
+    driver: bridge

@@ -1,0 +1,59 @@
+# Semana 9 — demos del jueves (solo docente).
+#
+# Demo 1, comunicación transiente
+#   docker compose up -d servidor cliente
+#   docker compose exec cliente python cliente.py ECO hola
+#   docker compose pause servidor
+#   docker compose exec cliente python cliente.py ECO hola      -> espera 5 s y se rinde
+#   docker compose unpause servidor                              -> el servidor procesa tarde, nadie escucha
+#   docker compose stop servidor
+#   docker compose exec cliente python cliente.py ECO hola      -> rechazo inmediato
+#
+# Demo 2, serialización comparada (necesita protobuf, se instala al construir la imagen)
+#   docker compose run --rm demo
+#   docker compose run --rm demo python serializar.py 100000
+
+services:
+  servidor:
+    image: python:3.12-slim
+    container_name: sd_servidor
+    working_dir: /app
+    volumes:
+      - ./:/app
+    command: python servidor.py
+    environment:
+      CODEC: ${CODEC:-json}
+      SERVIDOR_PUERTO: "5000"
+    networks:
+      - sd_net
+
+  cliente:
+    image: python:3.12-slim
+    container_name: sd_cliente
+    working_dir: /app
+    volumes:
+      - ./:/app
+    command: sleep infinity
+    environment:
+      CODEC: ${CODEC:-json}
+      SERVIDOR_HOST: servidor
+      SERVIDOR_PUERTO: "5000"
+      TIMEOUT_CLIENTE: "5"
+    depends_on:
+      - servidor
+    networks:
+      - sd_net
+
+  demo:
+    build: .
+    container_name: sd_demo
+    working_dir: /app
+    volumes:
+      - ./:/app
+    command: python serializar.py
+    networks:
+      - sd_net
+
+networks:
+  sd_net:
+    name: sd_net

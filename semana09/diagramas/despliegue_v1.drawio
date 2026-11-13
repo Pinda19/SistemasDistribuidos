@@ -1,0 +1,82 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net" modified="2026-10-14T00:00:00.000Z" agent="RepoSync-Semana07" version="24.7.17" type="device">
+  <diagram name="Despliegue v1 - RepoSync Semana 6" id="reposync-despliegue-v1---reposync-semana-6">
+    <mxGraphModel dx="1540" dy="865" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1540" pageHeight="865" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="&lt;b&gt;RepoSync · Despliegue v1&lt;/b&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#FFFFFF;strokeWidth=2;dashed=0;fontColor=#183348;fontSize=31;fontFamily=Arial;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=12;spacingTop=7;spacingBottom=7;" vertex="1" parent="1">
+          <mxGeometry x="50" y="18" width="1430" height="53" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" value="Semana 6   |   Tema 04: Control de versiones distribuido   |   TCP concurrente" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#FFFFFF;strokeWidth=2;dashed=0;fontColor=#4E6474;fontSize=15;fontFamily=Arial;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=12;spacingTop=7;spacingBottom=7;" vertex="1" parent="1">
+          <mxGeometry x="58" y="72" width="1410" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="host" value="&lt;b&gt;Computador del equipo (anfitrión)&lt;/b&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#F6F9FB;strokeColor=#8295A3;strokeWidth=2;dashed=1;fontColor=#183348;fontSize=17;fontFamily=Arial;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=12;spacingTop=7;spacingBottom=7;" vertex="1" parent="1">
+          <mxGeometry x="52" y="124" width="1157" height="497" as="geometry" />
+        </mxCell>
+        <mxCell id="net" value="&lt;b&gt;Red Docker: sd_net  ·  bridge&lt;/b&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFF8F8;strokeColor=#BD3141;strokeWidth=2;dashed=1;fontColor=#183348;fontSize=17;fontFamily=Arial;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=12;spacingTop=7;spacingBottom=7;" vertex="1" parent="1">
+          <mxGeometry x="91" y="184" width="1080" height="395" as="geometry" />
+        </mxCell>
+        <mxCell id="client" value="&lt;b&gt;cliente&lt;/b&gt;&lt;br&gt;sd_cliente&lt;br&gt;cliente.py · TCP" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#BD3141;strokeWidth=2;dashed=0;fontColor=#183348;fontSize=17;fontFamily=Arial;align=center;verticalAlign=middle;spacingLeft=12;spacingRight=12;spacingTop=7;spacingBottom=7;" vertex="1" parent="1">
+          <mxGeometry x="165" y="266" width="235" height="98" as="geometry" />
+        </mxCell>
+        <mxCell id="load" value="&lt;b&gt;carga&lt;/b&gt;&lt;br&gt;sd_carga&lt;br&gt;cliente_carga.py" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#BD3141;strokeWidth=2;dashed=0;fontColor=#183348;fontSize=17;fontFamily=Arial;align=center;verticalAlign=middle;spacingLeft=12;spacingRight=12;spacingTop=7;spacingBottom=7;" vertex="1" parent="1">
+          <mxGeometry x="165" y="416" width="235" height="98" as="geometry" />
+        </mxCell>
+        <mxCell id="server" value="&lt;b&gt;servidor · RepoSync&lt;/b&gt;&lt;br&gt;sd_servidor&lt;br&gt;servidor.py · hilo por cliente&lt;br&gt;TCP 5000 · Lock" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1E8E81;strokeWidth=3;dashed=0;fontColor=#183348;fontSize=19;fontFamily=Arial;align=center;verticalAlign=middle;spacingLeft=12;spacingRight=12;spacingTop=7;spacingBottom=7;" vertex="1" parent="1">
+          <mxGeometry x="697" y="323" width="280" height="142" as="geometry" />
+        </mxCell>
+        <mxCell id="state" value="&lt;b&gt;Estado compartido, en RAM&lt;/b&gt;&lt;br&gt;Ramas · commits · referencias HEAD&lt;br&gt;Protegido con threading.Lock" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFF7E7;strokeColor=#B7782E;strokeWidth=2;dashed=0;fontColor=#183348;fontSize=16;fontFamily=Arial;align=center;verticalAlign=middle;spacingLeft=12;spacingRight=12;spacingTop=7;spacingBottom=7;" vertex="1" parent="1">
+          <mxGeometry x="715" y="483" width="400" height="81" as="geometry" />
+        </mxCell>
+        <mxCell id="external" value="&lt;b&gt;Otro equipo&lt;/b&gt;&lt;br&gt;Cliente TCP externo&lt;br&gt;Prueba cruzada" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#EAF3FA;strokeColor=#3275A9;strokeWidth=2;dashed=0;fontColor=#183348;fontSize=18;fontFamily=Arial;align=center;verticalAlign=middle;spacingLeft=12;spacingRight=12;spacingTop=7;spacingBottom=7;" vertex="1" parent="1">
+          <mxGeometry x="1264" y="328" width="226" height="129" as="geometry" />
+        </mxCell>
+        <mxCell id="footHeader" value="&lt;b&gt;Comportamiento ante fallas · semana 6&lt;/b&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#FFFFFF;strokeWidth=2;dashed=0;fontColor=#183348;fontSize=19;fontFamily=Arial;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=12;spacingTop=7;spacingBottom=7;" vertex="1" parent="1">
+          <mxGeometry x="52" y="640" width="1436" height="43" as="geometry" />
+        </mxCell>
+        <mxCell id="f1" value="&lt;b&gt;CAE cliente o carga&lt;/b&gt;&lt;br&gt;Sólo se pierde esa conexión.&lt;br&gt;Las demás sesiones siguen funcionando." style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#F7FAFC;strokeColor=#CCD7DE;strokeWidth=2;dashed=0;fontColor=#183348;fontSize=16;fontFamily=Arial;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=12;spacingTop=7;spacingBottom=7;" vertex="1" parent="1">
+          <mxGeometry x="52" y="696" width="448" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="f2" value="&lt;b&gt;CAE servidor&lt;/b&gt;&lt;br&gt;Se interrumpen las operaciones.&lt;br&gt;El estado en RAM se pierde al reiniciar." style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#F7FAFC;strokeColor=#CCD7DE;strokeWidth=2;dashed=0;fontColor=#183348;fontSize=16;fontFamily=Arial;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=12;spacingTop=7;spacingBottom=7;" vertex="1" parent="1">
+          <mxGeometry x="521" y="696" width="479" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="f3" value="&lt;b&gt;FALLA acceso externo&lt;/b&gt;&lt;br&gt;Otros equipos pierden acceso al TCP 5000.&lt;br&gt;Las conexiones internas pueden continuar." style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#F7FAFC;strokeColor=#CCD7DE;strokeWidth=2;dashed=0;fontColor=#183348;fontSize=16;fontFamily=Arial;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=12;spacingTop=7;spacingBottom=7;" vertex="1" parent="1">
+          <mxGeometry x="1021" y="696" width="467" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="v1footer" value="Puerto publicado: anfitrión 5000 → contenedor 5000   |   Tres servicios: servidor, cliente, carga   |   Sin persistencia ni réplicas" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#FFFFFF;strokeWidth=2;dashed=0;fontColor=#4E6474;fontSize=13;fontFamily=Arial;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=12;spacingTop=7;spacingBottom=7;" vertex="1" parent="1">
+          <mxGeometry x="55" y="817" width="1400" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="e_client" value="TCP 5000" style="edgeStyle=none;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#BD3141;strokeWidth=3;fontColor=#BD3141;fontSize=13;fontStyle=1;labelBackgroundColor=#FFFFFF;dashed=0;" edge="1" parent="1" source="client" target="server">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="400" y="315" as="sourcePoint" />
+            <mxPoint x="697" y="365" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="545" y="315" />
+              <mxPoint x="545" y="365" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_load" value="TCP 5000" style="edgeStyle=none;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#BD3141;strokeWidth=3;fontColor=#BD3141;fontSize=13;fontStyle=1;labelBackgroundColor=#FFFFFF;dashed=0;" edge="1" parent="1" source="load" target="server">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="400" y="465" as="sourcePoint" />
+            <mxPoint x="697" y="425" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="550" y="465" />
+              <mxPoint x="550" y="425" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_ext" value="TCP 5000 · publicado" style="edgeStyle=none;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#3275A9;strokeWidth=3;fontColor=#3275A9;fontSize=13;fontStyle=1;labelBackgroundColor=#FFFFFF;dashed=0;" edge="1" parent="1" source="external" target="server">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1264" y="396" as="sourcePoint" />
+            <mxPoint x="977" y="396" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="1210" y="396" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

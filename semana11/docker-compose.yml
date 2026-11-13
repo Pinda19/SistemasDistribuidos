@@ -1,0 +1,33 @@
+# Semana 11 · RepoSync gRPC, aislado para no colisionar con semanas 9 y 10.
+services:
+  servidor:
+    build: .
+    image: sd_grpc_reposync:semana11
+    container_name: sd11_servidor
+    command: python -u servidor_grpc.py
+    environment:
+      SERVIDOR_PUERTO: "50051"
+      FALLA: ${FALLA:-no}
+      DEMORA: ${DEMORA:-3}
+      DEDUP: ${DEDUP:-0}
+    volumes:
+      - .:/app
+    ports:
+      - "50051:50051"
+    networks: [sd11_net]
+  cliente:
+    build: .
+    image: sd_grpc_reposync:semana11
+    container_name: sd11_cliente
+    command: sleep infinity
+    depends_on: [servidor]
+    environment:
+      SERVIDOR_HOST: servidor
+      SERVIDOR_PUERTO: "50051"
+      TIMEOUT_CLIENTE: "2"
+    volumes:
+      - .:/app
+    networks: [sd11_net]
+networks:
+  sd11_net:
+    name: sd11_net

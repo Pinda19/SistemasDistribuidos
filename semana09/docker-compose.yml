@@ -1,0 +1,39 @@
+# RepoSync Semana 9 — sobre la plantilla oficial, solo TCP cliente + servidor.
+# api.py y nginx.conf de Semana 7 se conservan como archivos, pero NO se
+# levantan hoy: hablan el protocolo de líneas antiguo y requieren adaptación.
+services:
+  servidor:
+    image: python:3.12-slim
+    container_name: sd_servidor
+    working_dir: /app
+    volumes:
+      - ./:/app
+    command: python -u servidor.py
+    environment:
+      CODEC: ${CODEC:-json}
+      SERVIDOR_PUERTO: "5000"
+      TIMEOUT_SERVIDOR: "30"
+      PAUSA_CARRERA: "0"
+    networks: [sd_net]
+
+  cliente:
+    image: python:3.12-slim
+    container_name: sd_cliente
+    working_dir: /app
+    volumes:
+      - ./:/app
+    command: sleep infinity
+    stdin_open: true
+    tty: true
+    environment:
+      CODEC: ${CODEC:-json}
+      SERVIDOR_HOST: servidor
+      SERVIDOR_PUERTO: "5000"
+      TIMEOUT_CLIENTE: "5"
+    depends_on: [servidor]
+    networks: [sd_net]
+
+networks:
+  sd_net:
+    name: sd_net
+    driver: bridge

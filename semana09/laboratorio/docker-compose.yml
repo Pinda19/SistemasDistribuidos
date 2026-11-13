@@ -1,0 +1,47 @@
+# Semana 9 — servicio con mensajes estructurados y codec intercambiable.
+# Parte del docker-compose.yml de semana07/. Mantengan api1, api2 y nginx tal
+# como estaban. Lo nuevo es la variable CODEC en servidor y cliente.
+#
+#   docker compose up -d --build servidor cliente
+#   docker compose exec cliente python cliente.py AGREGAR tornillo 25
+#   CODEC=bin docker compose up -d --force-recreate servidor cliente
+
+services:
+  servidor:
+    image: python:3.12-slim
+    container_name: sd_servidor
+    working_dir: /app
+    volumes:
+      - ./:/app
+    command: python servidor.py
+    environment:
+      CODEC: ${CODEC:-json}
+      SERVIDOR_PUERTO: "5000"
+      TIMEOUT_SERVIDOR: "30"
+    networks:
+      - sd_net
+
+  cliente:
+    image: python:3.12-slim
+    container_name: sd_cliente
+    working_dir: /app
+    volumes:
+      - ./:/app
+    command: sleep infinity
+    environment:
+      CODEC: ${CODEC:-json}
+      SERVIDOR_HOST: servidor
+      SERVIDOR_PUERTO: "5000"
+      TIMEOUT_CLIENTE: "5"
+    depends_on:
+      - servidor
+    networks:
+      - sd_net
+
+  # api1, api2 y nginx vienen de semana07/ sin cambios. Si su api/ habla con el
+  # servidor TCP, reemplacen la función que arma la línea de texto por
+  # codec.enviar / codec.recibir y agreguen CODEC a su environment.
+
+networks:
+  sd_net:
+    name: sd_net

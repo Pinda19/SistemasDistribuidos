@@ -1,0 +1,111 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net" modified="2026-10-14T00:00:00.000Z" agent="RepoSync-Semana07" version="24.7.17" type="device">
+  <diagram name="Despliegue v2 - RepoSync Semana 7" id="reposync-despliegue-v2---reposync-semana-7">
+    <mxGraphModel dx="1660" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1660" pageHeight="1000" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="&lt;b&gt;RepoSync · Despliegue v2&lt;/b&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#FFFFFF;strokeWidth=2;dashed=0;fontColor=#183348;fontSize=31;fontFamily=Arial;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=12;spacingTop=7;spacingBottom=7;" vertex="1" parent="1">
+          <mxGeometry x="45" y="18" width="1560" height="52" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" value="Semana 7   |   REST con FastAPI + balanceo Nginx   |   3 niveles / 5 servicios" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#FFFFFF;strokeWidth=2;dashed=0;fontColor=#4E6474;fontSize=15;fontFamily=Arial;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=12;spacingTop=7;spacingBottom=7;" vertex="1" parent="1">
+          <mxGeometry x="50" y="75" width="1550" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="host" value="&lt;b&gt;Computador del equipo (anfitrión)&lt;/b&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#F6F9FB;strokeColor=#8295A3;strokeWidth=2;dashed=1;fontColor=#183348;fontSize=17;fontFamily=Arial;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=12;spacingTop=7;spacingBottom=7;" vertex="1" parent="1">
+          <mxGeometry x="302" y="129" width="1308" height="613" as="geometry" />
+        </mxCell>
+        <mxCell id="net" value="&lt;b&gt;Red Docker: sd_net  ·  bridge&lt;/b&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFF8F8;strokeColor=#BD3141;strokeWidth=2;dashed=1;fontColor=#183348;fontSize=17;fontFamily=Arial;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=12;spacingTop=7;spacingBottom=7;" vertex="1" parent="1">
+          <mxGeometry x="335" y="184" width="1238" height="521" as="geometry" />
+        </mxCell>
+        <mxCell id="browser" value="&lt;b&gt;Cliente HTTP externo&lt;/b&gt;&lt;br&gt;Navegador u otro equipo&lt;br&gt;http://HOST:8080" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#EAF3FA;strokeColor=#3275A9;strokeWidth=2;dashed=0;fontColor=#183348;fontSize=18;fontFamily=Arial;align=center;verticalAlign=middle;spacingLeft=12;spacingRight=12;spacingTop=7;spacingBottom=7;" vertex="1" parent="1">
+          <mxGeometry x="31" y="348" width="237" height="132" as="geometry" />
+        </mxCell>
+        <mxCell id="nginx" value="&lt;b&gt;nginx&lt;/b&gt;&lt;br&gt;sd_nginx · entrada única&lt;br&gt;HTTP interno 80&lt;br&gt;balanceador" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#3275A9;strokeWidth=3;dashed=0;fontColor=#183348;fontSize=17;fontFamily=Arial;align=center;verticalAlign=middle;spacingLeft=12;spacingRight=12;spacingTop=7;spacingBottom=7;" vertex="1" parent="1">
+          <mxGeometry x="389" y="352" width="207" height="126" as="geometry" />
+        </mxCell>
+        <mxCell id="api1" value="&lt;b&gt;api1 · FastAPI&lt;/b&gt;&lt;br&gt;sd_api1&lt;br&gt;HTTP 8000 · sin estado" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#3275A9;strokeWidth=2;dashed=0;fontColor=#183348;fontSize=17;fontFamily=Arial;align=center;verticalAlign=middle;spacingLeft=12;spacingRight=12;spacingTop=7;spacingBottom=7;" vertex="1" parent="1">
+          <mxGeometry x="756" y="270" width="233" height="112" as="geometry" />
+        </mxCell>
+        <mxCell id="api2" value="&lt;b&gt;api2 · FastAPI&lt;/b&gt;&lt;br&gt;sd_api2&lt;br&gt;HTTP 8000 · sin estado" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#3275A9;strokeWidth=2;dashed=0;fontColor=#183348;fontSize=17;fontFamily=Arial;align=center;verticalAlign=middle;spacingLeft=12;spacingRight=12;spacingTop=7;spacingBottom=7;" vertex="1" parent="1">
+          <mxGeometry x="756" y="489" width="233" height="112" as="geometry" />
+        </mxCell>
+        <mxCell id="srv" value="&lt;b&gt;servidor · RepoSync&lt;/b&gt;&lt;br&gt;sd_servidor · TCP 5000&lt;br&gt;1 hilo/cliente + Lock" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1E8E81;strokeWidth=3;dashed=0;fontColor=#183348;fontSize=18;fontFamily=Arial;align=center;verticalAlign=middle;spacingLeft=12;spacingRight=12;spacingTop=7;spacingBottom=7;" vertex="1" parent="1">
+          <mxGeometry x="1180" y="373" width="336" height="137" as="geometry" />
+        </mxCell>
+        <mxCell id="state" value="&lt;b&gt;Estado centralizado · RAM&lt;/b&gt;&lt;br&gt;Ramas · commits · HEAD&lt;br&gt;Las API no guardan estado" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFF7E7;strokeColor=#B7782E;strokeWidth=2;dashed=0;fontColor=#183348;fontSize=16;fontFamily=Arial;align=center;verticalAlign=middle;spacingLeft=12;spacingRight=12;spacingTop=7;spacingBottom=7;" vertex="1" parent="1">
+          <mxGeometry x="1180" y="532" width="336" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="httpclient" value="&lt;b&gt;cliente&lt;/b&gt;&lt;br&gt;sd_cliente&lt;br&gt;cliente_http.py" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#BD3141;strokeWidth=2;dashed=0;fontColor=#183348;fontSize=16;fontFamily=Arial;align=center;verticalAlign=middle;spacingLeft=12;spacingRight=12;spacingTop=7;spacingBottom=7;" vertex="1" parent="1">
+          <mxGeometry x="415" y="597" width="187" height="79" as="geometry" />
+        </mxCell>
+        <mxCell id="footHeader" value="&lt;b&gt;Fallas y recuperación · semana 7&lt;/b&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#FFFFFF;strokeWidth=2;dashed=0;fontColor=#183348;fontSize=19;fontFamily=Arial;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=12;spacingTop=7;spacingBottom=7;" vertex="1" parent="1">
+          <mxGeometry x="45" y="756" width="1554" height="38" as="geometry" />
+        </mxCell>
+        <mxCell id="f1" value="&lt;b&gt;CAE api1 o api2&lt;/b&gt;&lt;br&gt;Nginx puede redirigir peticiones&lt;br&gt;a la otra API disponible." style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#F7FAFC;strokeColor=#CCD7DE;strokeWidth=2;dashed=0;fontColor=#183348;fontSize=16;fontFamily=Arial;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=12;spacingTop=7;spacingBottom=7;" vertex="1" parent="1">
+          <mxGeometry x="45" y="808" width="489" height="118" as="geometry" />
+        </mxCell>
+        <mxCell id="f2" value="&lt;b&gt;CAE servidor RepoSync&lt;/b&gt;&lt;br&gt;Ambas API quedan sin backend TCP;&lt;br&gt;las consultas devuelven error HTTP 503." style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#F7FAFC;strokeColor=#CCD7DE;strokeWidth=2;dashed=0;fontColor=#183348;fontSize=16;fontFamily=Arial;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=12;spacingTop=7;spacingBottom=7;" vertex="1" parent="1">
+          <mxGeometry x="551" y="808" width="510" height="118" as="geometry" />
+        </mxCell>
+        <mxCell id="f3" value="&lt;b&gt;CAE nginx&lt;/b&gt;&lt;br&gt;Se pierde la puerta pública HTTP 8080.&lt;br&gt;API y servidor pueden seguir activos." style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#F7FAFC;strokeColor=#CCD7DE;strokeWidth=2;dashed=0;fontColor=#183348;fontSize=16;fontFamily=Arial;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=12;spacingTop=7;spacingBottom=7;" vertex="1" parent="1">
+          <mxGeometry x="1078" y="808" width="517" height="118" as="geometry" />
+        </mxCell>
+        <mxCell id="v2footer" value="Publicado: sólo HTTP 8080 → 80 (Nginx)   |   Internos: HTTP 8000 y TCP 5000   |   El estado no persiste si reinicia sd_servidor" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#FFFFFF;strokeWidth=2;dashed=0;fontColor=#4E6474;fontSize=14;fontFamily=Arial;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=12;spacingTop=7;spacingBottom=7;" vertex="1" parent="1">
+          <mxGeometry x="46" y="940" width="1550" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="e_ext" value="HTTP 8080 → 80" style="edgeStyle=none;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#3275A9;strokeWidth=3;fontColor=#3275A9;fontSize=13;fontStyle=1;labelBackgroundColor=#FFFFFF;dashed=0;" edge="1" parent="1" source="browser" target="nginx">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="268" y="415" as="sourcePoint" />
+            <mxPoint x="389" y="415" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_local" value="HTTP 80 interno" style="edgeStyle=none;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#3275A9;strokeWidth=3;fontColor=#3275A9;fontSize=13;fontStyle=1;labelBackgroundColor=#FFFFFF;dashed=0;" edge="1" parent="1" source="httpclient" target="nginx">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="500" y="597" as="sourcePoint" />
+            <mxPoint x="500" y="478" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_ngx1" value="HTTP 8000" style="edgeStyle=none;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#3275A9;strokeWidth=3;fontColor=#3275A9;fontSize=13;fontStyle=1;labelBackgroundColor=#FFFFFF;dashed=0;" edge="1" parent="1" source="nginx" target="api1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="596" y="394" as="sourcePoint" />
+            <mxPoint x="756" y="326" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="663" y="394" />
+              <mxPoint x="663" y="326" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_ngx2" value="HTTP 8000" style="edgeStyle=none;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#3275A9;strokeWidth=3;fontColor=#3275A9;fontSize=13;fontStyle=1;labelBackgroundColor=#FFFFFF;dashed=0;" edge="1" parent="1" source="nginx" target="api2">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="596" y="442" as="sourcePoint" />
+            <mxPoint x="756" y="545" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="663" y="442" />
+              <mxPoint x="663" y="545" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_a1s" value="TCP 5000" style="edgeStyle=none;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#BD3141;strokeWidth=3;fontColor=#BD3141;fontSize=13;fontStyle=1;labelBackgroundColor=#FFFFFF;dashed=0;" edge="1" parent="1" source="api1" target="srv">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="989" y="326" as="sourcePoint" />
+            <mxPoint x="1180" y="411" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="1080" y="326" />
+              <mxPoint x="1080" y="411" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_a2s" value="TCP 5000" style="edgeStyle=none;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#BD3141;strokeWidth=3;fontColor=#BD3141;fontSize=13;fontStyle=1;labelBackgroundColor=#FFFFFF;dashed=0;" edge="1" parent="1" source="api2" target="srv">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="989" y="545" as="sourcePoint" />
+            <mxPoint x="1180" y="471" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="1085" y="545" />
+              <mxPoint x="1085" y="471" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

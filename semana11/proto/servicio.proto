@@ -1,0 +1,54 @@
+// RepoSync · Semana 11 · gRPC y Protocol Buffers (version 1 del contrato).
+// Al modificar el esquema, no reutilizar numeros de campo.
+syntax = "proto3";
+package reposync.v1;
+
+service RepoSync {
+  rpc Clonar (ClonarSolicitud) returns (EstadoRamaRespuesta);
+  rpc Rama (RamaSolicitud) returns (EstadoRamaRespuesta);
+  rpc Push (PushSolicitud) returns (EstadoRamaRespuesta);
+  rpc Historial (HistorialSolicitud) returns (HistorialRespuesta);
+  // Operacion nueva: demuestra reintentos NO idempotentes sin perder la
+  // proteccion del HEAD que conserva Push. Ver contrato.md.
+  rpc PublicarAuto (PublicarAutoSolicitud) returns (EstadoRamaRespuesta);
+}
+
+message ClonarSolicitud {
+  string repo = 1;
+  string rama = 2;
+}
+message RamaSolicitud {
+  string id_solicitud = 1;
+  string repo = 2;
+  string nueva = 3;
+  string origen = 4;
+}
+message PushSolicitud {
+  string id_solicitud = 1;
+  string repo = 2;
+  string rama = 3;
+  int64 base = 4;
+  string mensaje = 5;
+}
+message HistorialSolicitud {
+  string repo = 1;
+  string rama = 2;
+}
+message PublicarAutoSolicitud {
+  string id_solicitud = 1;
+  string repo = 2;
+  string rama = 3;
+  string mensaje = 4;
+}
+message EstadoRamaRespuesta {
+  string repositorio = 1;
+  string rama = 2;
+  int64 head = 3;
+}
+message Revision {
+  int64 numero = 1;
+  string mensaje = 2;
+}
+message HistorialRespuesta {
+  repeated Revision revisiones = 1;
+}

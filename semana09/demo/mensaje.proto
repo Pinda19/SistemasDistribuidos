@@ -1,0 +1,18 @@
+// mensaje.proto — el mismo esquema de mensajes.py, en el IDL de Protocol Buffers.
+// Solo para la demo del jueves. En la semana 11 lo van a escribir ustedes.
+syntax = "proto3";
+
+message Solicitud {
+  uint32 version = 1;
+  uint32 id = 2;
+  string operacion = 3;
+  repeated string argumentos = 4;
+}
+
+message Respuesta {
+  uint32 id = 1;
+  enum Estado { OK = 0; ERROR = 1; }
+  Estado estado = 2;
+  repeated string datos = 3;
+  string error = 4;
+}
