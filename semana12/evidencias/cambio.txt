@@ -1,0 +1,4 @@
+15:04:46 recibí Proxy, referencia PYRO:obj_c04f356a3b694375a0ed0095f4314d9a@servidor:9100
+15:04:46 estado remoto {'repositorio': 'proyecto', 'rama': 'main', 'autor': 'Thomas', 'base': 1, 'archivos': ['temporal.txt']}
+15:04:46 espero 6.0 s; ahora se puede provocar la caída
+15:04:52 ERROR de comunicación; resultado de una escritura puede ser DESCONOCIDO: receiving: not enough data

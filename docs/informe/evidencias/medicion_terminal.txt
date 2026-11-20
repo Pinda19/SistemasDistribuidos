@@ -1,0 +1,26 @@
+RepoSync - Evaluacion 4 - Medicion real
+Fecha UTC: 2026-11-20T15:41:43.427029+00:00
+Python: 3.12.16
+Misma consulta: clonar(proyecto, main), HEAD=0, sin escrituras
+200 llamadas medidas por mecanismo + 10 de calentamiento + 1 de tamano
+Los dos servidores permanecen activos; consultas secuenciales, un cliente
+El tamano es payload serializado, no trafico completo de red
+Pyro5 listo: sd.pinda.repositorio; {'repositorio': 'proyecto', 'rama': 'main', 'head': 0}
+gRPC listo: grpc:50051; proyecto/main HEAD=0
+
+Medicion grpc:
+| Mecanismo | Operación | n | p50 ms | p95 ms | media ms | máx ms | respuesta bytes |
+|---|---|---|---|---|---|---|---|
+| grpc | clonar | 200 | 0.83 | 1.32 | 0.91 | 1.49 | 16 |
+
+fila agregada a /resultados/corridas/20261120T154143_417429Z/mediciones_grpc.csv
+
+Medicion pyro:
+| Mecanismo | Operación | n | p50 ms | p95 ms | media ms | máx ms | respuesta bytes |
+|---|---|---|---|---|---|---|---|
+| pyro | clonar | 200 | 0.41 | 0.6 | 0.43 | 2.52 | 75 |
+
+fila agregada a /resultados/corridas/20261120T154143_417429Z/mediciones_pyro.csv
+
+MEDICIONES TERMINADAS
+Adjuntar docs/informe/evidencias/medicion_terminal.txt

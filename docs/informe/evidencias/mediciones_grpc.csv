@@ -1,0 +1,2 @@
+mecanismo,operacion,n,p50_ms,p95_ms,media_ms,max_ms,respuesta_bytes
+grpc,clonar,200,0.83,1.32,0.91,1.49,16

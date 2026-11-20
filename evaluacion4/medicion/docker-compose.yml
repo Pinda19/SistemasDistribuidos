@@ -1,0 +1,52 @@
+x-runtime: &runtime
+  image: reposync_medicion:eval4
+  build:
+    context: ../..
+    dockerfile: evaluacion4/medicion/Dockerfile
+  networks: [medicion_net]
+
+services:
+  nombres:
+    <<: *runtime
+    command: python -m Pyro5.nameserver -n nombres -p 9090 -x
+  grpc:
+    <<: *runtime
+    working_dir: /app/grpc
+    command: python -u servidor_grpc.py
+    environment:
+      SERVIDOR_PUERTO: "50051"
+      FALLA: "no"
+      DEDUP: "0"
+  pyro:
+    <<: *runtime
+    working_dir: /app/pyro
+    command: python -u servidor_pyro.py
+    environment:
+      SERVIDOR_HOST: pyro
+      SERVIDOR_PUERTO: "9100"
+      NOMBRES_HOST: nombres
+      NOMBRES_PUERTO: "9090"
+      EQUIPO: pinda
+      MODO: single
+      POR_VALOR: "0"
+      REREGISTRO: "0"
+    depends_on: [nombres]
+  cliente:
+    <<: *runtime
+    working_dir: /app/medicion
+    command: sleep infinity
+    environment:
+      PYTHONPATH: /app/grpc
+      SERVIDOR_HOST: grpc
+      SERVIDOR_PUERTO: "50051"
+      NOMBRES_HOST: nombres
+      NOMBRES_PUERTO: "9090"
+      EQUIPO: pinda
+      RESULTADOS_DIR: /resultados
+    volumes:
+      - ../../docs/informe/evidencias:/resultados
+    depends_on: [grpc, pyro]
+
+networks:
+  medicion_net:
+    driver: bridge

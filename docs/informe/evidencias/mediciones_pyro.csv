@@ -1,0 +1,2 @@
+mecanismo,operacion,n,p50_ms,p95_ms,media_ms,max_ms,respuesta_bytes
+pyro,clonar,200,0.41,0.6,0.43,2.52,75

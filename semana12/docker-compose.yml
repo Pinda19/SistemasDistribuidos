@@ -1,0 +1,33 @@
+services:
+  nombres:
+    build: .
+    command: python -m Pyro5.nameserver -n nombres -p 9090 -x
+    networks: [sd_net]
+  servidor:
+    build: .
+    command: python -u servidor_pyro.py
+    environment:
+      SERVIDOR_HOST: servidor
+      SERVIDOR_PUERTO: "9100"
+      NOMBRES_HOST: nombres
+      NOMBRES_PUERTO: "9090"
+      EQUIPO: ${EQUIPO:-pinda}
+      MODO: ${MODO:-single}
+      POR_VALOR: ${POR_VALOR:-0}
+      REREGISTRO: ${REREGISTRO:-0}
+    depends_on: [nombres]
+    networks: [sd_net]
+  cliente:
+    build: .
+    command: sleep infinity
+    environment:
+      NOMBRES_HOST: nombres
+      NOMBRES_PUERTO: "9090"
+      EQUIPO: ${EQUIPO:-pinda}
+    depends_on: [servidor]
+    volumes:
+      - ./evidencias:/evidencias
+    networks: [sd_net]
+networks:
+  sd_net:
+    driver: bridge

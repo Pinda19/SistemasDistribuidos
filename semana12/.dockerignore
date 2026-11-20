@@ -1,0 +1,7 @@
+__pycache__
+*.pyc
+observaciones.md
+calidad.md
+README.md
+.env
+evidencias
